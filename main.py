@@ -7,6 +7,7 @@ This is the main entry file to the application.
 # Imports
 import sys
 from PySide6.QtWidgets import QMainWindow, QApplication
+from ui.calculator_widget import CalculatorWidget
 
 
 class MainWindow(QMainWindow): 
@@ -23,7 +24,7 @@ class MainWindow(QMainWindow):
     def initUI(self):
         """Initialize the user interface components."""
         # Here you can add widgets and layout setup
-        pass
+        self.setCentralWidget(CalculatorWidget())
         
         
 if __name__ == "__main__":
