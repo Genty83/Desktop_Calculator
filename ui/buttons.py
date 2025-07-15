@@ -18,8 +18,10 @@ Example:
     from ui.buttons import KEYPAD_BUTTONS, SCIENTIFIC_BUTTONS
 """
 
+from typing import List
+
 # Standard numeric keypad layout and arithmetic operators
-KEYPAD_BUTTONS = [
+KEYPAD_BUTTONS: List[List[str]] = [
     ['7', '8', '9', '/'],
     ['4', '5', '6', '*'],
     ['1', '2', '3', '-'],
@@ -32,7 +34,7 @@ KEYPAD_BUTTONS: List[List[str]]
 """
 
 # Scientific function and constant buttons
-SCIENTIFIC_BUTTONS = [
+SCIENTIFIC_BUTTONS: List[List[str]] = [
     ['sin', 'cos', 'tan', '^'],
     ['log', 'ln', '√', '%'],
     ['(', ')', 'pi', 'e'],
