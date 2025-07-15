@@ -17,8 +17,9 @@ Features:
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLineEdit, QGridLayout, QPushButton, QSizePolicy
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from typing import List
+import qtawesome as qta
 
 from logic.evaluator import ExpressionEvaluator
 from ui.buttons import KEYPAD_BUTTONS, SCIENTIFIC_BUTTONS
@@ -26,21 +27,24 @@ from ui.buttons import KEYPAD_BUTTONS, SCIENTIFIC_BUTTONS
 
 class CalculatorWidget(QWidget):
     """
-    CalculatorWidget handles the UI and interaction logic for a calculator,
-    including both basic keypad and scientific function buttons.
+    Main calculator interface widget for the desktop application.
 
-    The widget displays the current expression in a read-only QLineEdit
-    and updates the expression based on user button clicks.
-
-    When the '=' button is clicked, the expression is evaluated and the
-    result is displayed. Errors during evaluation display "Error".
+    This widget renders the calculator UI, manages layout of all components,
+    and handles user interactions such as button clicks and expression evaluation.
+    It supports both standard and scientific operations and integrates with
+    ExpressionEvaluator for safe mathematical parsing.
     """
+
+    toggle_sidebar = Signal()
+    """Signal emitted when the sidebar toggle button is pressed."""
 
     def __init__(self) -> None:
         """
-        Initialize the CalculatorWidget.
+        Initialize the calculator widget and its components.
 
-        Sets up the ExpressionEvaluator and builds the UI components.
+        - Instantiates the ExpressionEvaluator for computation.
+        - Builds and organizes the UI elements including display field,
+            keypad buttons, scientific function buttons, and a floating sidebar toggle.
         """
         super().__init__()
         self.evaluator = ExpressionEvaluator()
@@ -48,16 +52,27 @@ class CalculatorWidget(QWidget):
 
     def _init_ui(self) -> None:
         """
-        Initialize and assemble the UI layout.
+        Assemble the UI layout for the calculator.
 
-        Creates a vertical layout containing:
-        - A display line edit for expression and results
-        - A grid layout for basic keypad buttons
-        - A grid layout for scientific function buttons
+        This method creates and arranges:
+        - A top-aligned 'menu' button for toggling the sidebar.
+        - A read-only text display to show and edit mathematical expressions.
+        - A grid of standard keypad buttons (digits, basic operators).
+        - A grid of scientific calculator buttons (functions, constants).
+
+        Styling and spacing are configured to provide a clean and responsive interface.
         """
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(10)
+
+        self.menu_button = QPushButton(self)
+        self.menu_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.menu_button.setFixedHeight(40)
+        self.menu_button.setStyleSheet("font-size: 16px;")
+        self.menu_button.setIcon(qta.icon('fa5s.bars'))
+        self.menu_button.clicked.connect(self.toggle_sidebar.emit)
+        layout.addWidget(self.menu_button)
 
         self.display = QLineEdit(self)
         self.display.setReadOnly(True)
@@ -67,21 +82,22 @@ class CalculatorWidget(QWidget):
         self.display.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layout.addWidget(self.display)
 
-        # Add basic keypad buttons
         layout.addLayout(self._create_button_grid(KEYPAD_BUTTONS))
-
-        # Add scientific buttons below the keypad
         layout.addLayout(self._create_button_grid(SCIENTIFIC_BUTTONS))
 
     def _create_button_grid(self, button_rows: List[List[str]]) -> QGridLayout:
         """
-        Generate a grid layout of calculator buttons from a list of rows.
+        Create a grid layout populated with calculator buttons.
 
-        Each string in the rows corresponds to a button label. Buttons
-        will be added in a grid matching the row/column structure.
+        Each button is dynamically generated from the provided 2D list and
+        connected to its respective click handler. Buttons are styled to
+        expand within their grid cells and maintain consistent spacing.
 
-        :param button_rows: List of rows of button labels.
-        :return: QGridLayout with buttons arranged and signals connected.
+        Parameters:
+        - button_rows (List[List[str]]): Nested list of button labels.
+
+        Returns:
+        - QGridLayout: A layout object with fully initialized and connected buttons.
         """
         grid = QGridLayout()
         grid.setSpacing(5)
@@ -90,7 +106,6 @@ class CalculatorWidget(QWidget):
             for col_index, label in enumerate(row):
                 button = QPushButton(label)
                 button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                # Use lambda default arg to capture current label correctly
                 button.clicked.connect(lambda checked, text=label: self._handle_button_click(text))
                 grid.addWidget(button, row_index, col_index)
 
@@ -98,17 +113,16 @@ class CalculatorWidget(QWidget):
 
     def _handle_button_click(self, text: str) -> None:
         """
-        Handle a button click event based on the button's label.
+        Handle logic when a calculator button is pressed.
 
-        - 'C' clears the display.
-        - '=' evaluates the expression and shows the result or "Error".
-        - '^' is translated to Python exponent operator '**'.
-        - '√' is translated to 'sqrt(' to begin square root function.
-        - Scientific function buttons like 'sin', 'cos', 'tan', 'log', 'ln'
-            append the function name followed by an opening parenthesis '('.
-        - Other buttons append their label text directly to the display.
+        Depending on the button's label, performs the following:
+        - 'C': Clears the display.
+        - '=': Evaluates the current expression and displays the result.
+        - '^', '√', and scientific functions: Translates input into Python-compatible expressions.
+        - All other inputs are appended directly to the expression string.
 
-        :param text: The label of the button clicked.
+        Parameters:
+        - text (str): The label text of the clicked button.
         """
         if text == 'C':
             self.display.clear()
@@ -122,5 +136,4 @@ class CalculatorWidget(QWidget):
                 text = 'sqrt('
             elif text in ('sin', 'cos', 'tan', 'log', 'ln'):
                 text += '('
-            # Append button text or translated equivalent to the display
             self.display.setText(self.display.text() + text)
