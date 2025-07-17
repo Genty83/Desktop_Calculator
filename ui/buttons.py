@@ -25,7 +25,7 @@ KEYPAD_BUTTONS: List[List[str]] = [
     ['7', '8', '9', '/'],
     ['4', '5', '6', '*'],
     ['1', '2', '3', '-'],
-    ['0', 'C', '=', '+'],
+    ['0', '.', '%', '+'],
 ]
 """
 KEYPAD_BUTTONS: List[List[str]]
@@ -36,8 +36,10 @@ KEYPAD_BUTTONS: List[List[str]]
 # Scientific function and constant buttons
 SCIENTIFIC_BUTTONS: List[List[str]] = [
     ['sin', 'cos', 'tan', '^'],
-    ['log', 'ln', '√', '%'],
-    ['(', ')', 'pi', 'e'],
+    ['log', 'ln', '√', 'e'],
+    ['(', ')', 'pi', 'c'],
+    ['x!', 'x²', '1/x', 'AC'],
+    ['=']
 ]
 """
 SCIENTIFIC_BUTTONS: List[List[str]]

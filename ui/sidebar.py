@@ -22,7 +22,8 @@ class Sidebar(QWidget):
         self.setStyleSheet("""
             #sidebar {
                 background-color: hsl(0, 10%, 10%);
-                border-right: 1px solid #ccc;
+                border-top-right-radius: 10px;
+                border-bottom-right-radius: 10px;
             }
         """)
 

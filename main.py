@@ -74,16 +74,12 @@ class MainWindow(QMainWindow):
         current_width = self.sidebar.width()
         target_width = 200 if current_width == 0 else 0
 
-        animation = QPropertyAnimation(self.sidebar, b"geometry")
-        animation.setDuration(1000)
-        animation.setStartValue(QRect(0, 0, current_width, self.height()))
-        animation.setEndValue(QRect(0, 0, target_width, self.height()))
-
-        # Add easing curve
-        animation.setEasingCurve(QEasingCurve.OutCubic)
-
-        animation.start()
-        self.sidebar.setFixedWidth(target_width)
+        self.animation = QPropertyAnimation(self.sidebar, b"geometry")
+        self.animation.setDuration(1000)  # You can adjust this
+        self.animation.setStartValue(QRect(0, 0, current_width, self.height()))
+        self.animation.setEndValue(QRect(0, 0, target_width, self.height()))
+        self.animation.setEasingCurve(QEasingCurve.OutCubic)
+        self.animation.start()
 
 
 if __name__ == "__main__":
